@@ -36,8 +36,7 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
     private List<String> findAllJobLinks() {
         List<String> allLinks = new ArrayList<>();
         for (int i = 1;; ++i) {
-            // TODO: change 1 to i
-            this.webDriver.get(BASE_URL_FORMAT + 1);
+            this.webDriver.get(BASE_URL_FORMAT + i);
             if (CollectionUtils.isEmpty(this.webDriver.findElements(By.className("alert")))) {
 
                 List<WebElement> searchResultWebElement = this.webDriver
@@ -49,10 +48,6 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
 
                 allLinks.addAll(linksOnThisPage);
             } else {
-                break;
-            }
-            // TODO: remove this
-            if (i > 1) {
                 break;
             }
         }
