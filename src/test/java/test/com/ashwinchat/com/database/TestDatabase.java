@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +16,13 @@ import org.junit.Test;
 import com.ashwinchat.jobfinder.config.SqLiteDatabaseConnection;
 import com.ashwinchat.jobfinder.database.DatabaseUtil;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
+import com.ashwinchat.jobfinder.view.SystemConfig;
 
 public class TestDatabase {
     private static final String COMPANY_NAME = "test company name";
+    private static final String TEST_VALUE = "test value";
+    private static final String TEST_KEY = "testkey";
+    private static final String TEST_SYS_CD = "syscd";
     private Connection connection;
 
     @Before
@@ -27,6 +32,13 @@ public class TestDatabase {
         try (PreparedStatement statement = connection
                 .prepareStatement("delete from ScrapeInfo where companyName = ?")) {
             statement.setString(1, COMPANY_NAME);
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection
+                .prepareStatement("delete from SystemConfig where sysCd = ? and key = ?")) {
+            statement.setString(1, TEST_SYS_CD);
+            statement.setString(2, TEST_KEY);
             statement.execute();
         }
     }
@@ -80,6 +92,25 @@ public class TestDatabase {
             Assert.assertEquals(COMPANY_NAME, result.getString(2));
             Assert.assertTrue(result.next());
             Assert.assertEquals(COMPANY_NAME, result.getString(2));
+        }
+
+    }
+
+    @Test
+    public void testQuerySystemConfig() throws Exception {
+        try (PreparedStatement statement = connection
+                .prepareStatement("insert into SystemConfig (sysCd, key, value) values (?, ?, ?)")) {
+            statement.setString(1, TEST_SYS_CD);
+            statement.setString(2, TEST_KEY);
+            statement.setString(3, TEST_VALUE);
+            statement.execute();
+
+            List<SystemConfig> systemConfigs = DatabaseUtil.getSystemConfigValue(TEST_SYS_CD, TEST_KEY);
+            Assert.assertTrue(CollectionUtils.isNotEmpty(systemConfigs));
+            SystemConfig systemConfig = systemConfigs.get(0);
+            Assert.assertEquals(TEST_SYS_CD, systemConfig.getSysCd());
+            Assert.assertEquals(TEST_KEY, systemConfig.getKey());
+            Assert.assertEquals(TEST_VALUE, systemConfig.getValue());
         }
 
     }
