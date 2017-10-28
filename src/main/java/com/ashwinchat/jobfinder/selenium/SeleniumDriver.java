@@ -13,7 +13,7 @@ public class SeleniumDriver {
     private SeleniumDriver() {
         System.setProperty("webdriver.chrome.driver", "/chromedriver.exe");
         final ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
+        // chromeOptions.addArguments("--headless");
         this.driver = new ChromeDriver(chromeOptions);
     }
 

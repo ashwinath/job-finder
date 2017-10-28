@@ -24,7 +24,7 @@ public class LogStrategyDecorator implements ScrapingStrategy {
     public List<ScrapedInfo> scrape() {
         long startTime = System.currentTimeMillis();
         if (this.logger.isLoggable(Level.INFO)) {
-            this.logger.info(String.format("Begining to scrape: %s", this.name));
+            this.logger.info(String.format("Beginning to scrape: %s", this.name));
         }
 
         List<ScrapedInfo> scrapedInfo = this.scrapingStrategy.scrape();
