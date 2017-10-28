@@ -1,5 +1,6 @@
 package com.ashwinchat.jobfinder.view;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ScrapedInfo {
@@ -8,10 +9,10 @@ public class ScrapedInfo {
     private String url;
     private String jobDescr;
     private String agency;
-    private int payMin;
-    private int payMax;
-    private int expMin;
-    private int expMax;
+    private BigDecimal payMin;
+    private BigDecimal payMax;
+    private BigDecimal expMin;
+    private BigDecimal expMax;
     private LocalDateTime creOn;
 
     public String getTitle() {
@@ -54,35 +55,35 @@ public class ScrapedInfo {
         this.agency = agency;
     }
 
-    public int getPayMin() {
+    public BigDecimal getPayMin() {
         return this.payMin;
     }
 
-    public void setPayMin(int payMin) {
+    public void setPayMin(BigDecimal payMin) {
         this.payMin = payMin;
     }
 
-    public int getPayMax() {
+    public BigDecimal getPayMax() {
         return this.payMax;
     }
 
-    public void setPayMax(int payMax) {
+    public void setPayMax(BigDecimal payMax) {
         this.payMax = payMax;
     }
 
-    public int getExpMin() {
+    public BigDecimal getExpMin() {
         return this.expMin;
     }
 
-    public void setExpMin(int expMin) {
+    public void setExpMin(BigDecimal expMin) {
         this.expMin = expMin;
     }
 
-    public int getExpMax() {
+    public BigDecimal getExpMax() {
         return this.expMax;
     }
 
-    public void setExpMax(int expMax) {
+    public void setExpMax(BigDecimal expMax) {
         this.expMax = expMax;
     }
 

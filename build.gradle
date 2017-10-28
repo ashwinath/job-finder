@@ -18,7 +18,9 @@ repositories {
 
 dependencies {
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.6.0'
-
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+    
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
