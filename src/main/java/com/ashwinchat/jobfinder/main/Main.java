@@ -9,7 +9,8 @@ import com.ashwinchat.jobfinder.view.ScrapedInfo;
 public class Main {
     public static void main(String... args) {
         ScrapingStrategy strat = new TechinAsiaScrapingStrategy();
-        List<ScrapedInfo> scrapedInfo = strat.scrape();
-        scrapedInfo.forEach(System.out::println);
+        List<ScrapedInfo> scrapedInfos = strat.scrape();
+        scrapedInfos.forEach(System.out::println);
+        System.out.println(scrapedInfos.size());
     }
 }
