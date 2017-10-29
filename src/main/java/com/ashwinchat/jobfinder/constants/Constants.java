@@ -20,4 +20,9 @@ public final class Constants {
     public static final String SYS_CD_SELENIUM = "SELENIUM";
     public static final String KEY_HEADLESS = "HEADLESS";
     public static final String VALUE_TRUE = "TRUE";
+
+    public static final String SYS_CD_URL = "URL";
+    public static final String KEY_TECH_IN_ASIA = "TECHINASIA";
+
+    public static final String ERROR_DATABASE_CONNECT = "Unable to connect to database, please check if there is a database. It should be at ";
 }

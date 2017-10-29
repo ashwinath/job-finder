@@ -48,8 +48,7 @@ public class SeleniumDriverFactory {
             }
         } catch (Exception e) {
             logger.severe(ExceptionUtils.getRootCauseMessage(e));
-            logger.severe("Unable to connect to database, please check if there is a database. It should be at "
-                    + System.getProperty(Constants.DATABASE_LOCATION_PROPERTY));
+            logger.severe(Constants.ERROR_DATABASE_CONNECT + System.getProperty(Constants.DATABASE_LOCATION_PROPERTY));
             // No Database connection, no point continuing
             System.exit(-1);
         }

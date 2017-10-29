@@ -20,21 +20,43 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 
 import com.ashwinchat.jobfinder.constants.Constants;
+import com.ashwinchat.jobfinder.database.DatabaseUtil;
 import com.ashwinchat.jobfinder.factory.SeleniumDriverFactory;
 import com.ashwinchat.jobfinder.scraping.ScrapingStrategy;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
+import com.ashwinchat.jobfinder.view.SystemConfig;
 
 public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
 
     private static final String BASE_URL_FORMAT = "https://www.techinasia.com/jobs?job_category_name%5B%5D=Web%20Development&job_category_name%5B%5D=Enterprise%20Software%20%26%20Systems&job_type_name%5B%5D=Full-time&location_name%5B%5D=Singapore&page=";
     private static final String AGENCY_NAME = Constants.TECH_IN_ASIA_NAME;
-    private WebDriver webDriver = SeleniumDriverFactory.getInstance().createChromeWebDriver();
-    private Logger logger = Logger.getLogger(this.getClass().getName());
-
     private static final int NORMAL_SCENARIO = 0;
     private static final int NOT_YEARS_EXP_REQUIRED = 1;
     private static final int LESS_THAN_X_YEARS = 2;
     private static final int MORE_THAN_X_YEARS = 3;
+
+    private WebDriver webDriver = SeleniumDriverFactory.getInstance().createChromeWebDriver();
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private String baseUrl;
+
+    public TechinAsiaScrapingStrategy() {
+        try {
+            List<SystemConfig> configs = DatabaseUtil.getSystemConfigValue(Constants.SYS_CD_URL,
+                    Constants.KEY_TECH_IN_ASIA);
+            if (CollectionUtils.isNotEmpty(configs)) {
+                this.baseUrl = configs.get(0).getValue();
+            } else {
+                this.baseUrl = BASE_URL_FORMAT;
+            }
+
+        } catch (Exception e) {
+            this.logger.severe(ExceptionUtils.getRootCauseMessage(e));
+            this.logger.severe(
+                    Constants.ERROR_DATABASE_CONNECT + System.getProperty(Constants.DATABASE_LOCATION_PROPERTY));
+            // No Database connection, no point continuing
+            System.exit(-1);
+        }
+    }
 
     @Override
     public List<ScrapedInfo> scrape() {
@@ -49,7 +71,7 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
     private List<String> findAllJobLinks() {
         List<String> allLinks = new ArrayList<>();
         for (int i = 1;; ++i) {
-            this.webDriver.get(BASE_URL_FORMAT + i);
+            this.webDriver.get(baseUrl + i);
             if (CollectionUtils.isEmpty(this.webDriver.findElements(By.className("alert")))) {
 
                 List<WebElement> searchResultWebElement = this.webDriver
