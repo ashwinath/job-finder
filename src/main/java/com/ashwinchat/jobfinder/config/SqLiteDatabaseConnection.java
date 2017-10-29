@@ -5,13 +5,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import com.ashwinchat.jobfinder.constants.Constants;
+
 public class SqLiteDatabaseConnection {
     private static SqLiteDatabaseConnection instance;
     private Connection sqliteConnection;
 
     private SqLiteDatabaseConnection() throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        this.sqliteConnection = DriverManager.getConnection("jdbc:sqlite:/Users/chat/scraping/sqlite.db");
+        this.sqliteConnection = DriverManager
+                .getConnection("jdbc:sqlite:" + System.getProperty(Constants.DATABASE_LOCATION_PROPERTY));
     }
 
     public static SqLiteDatabaseConnection getInstance() throws ClassNotFoundException, SQLException {

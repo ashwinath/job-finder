@@ -17,8 +17,9 @@ import com.ashwinchat.jobfinder.view.ScrapedInfo;
 import com.ashwinchat.jobfinder.view.SystemConfig;
 
 import test.com.ashwinchat.jobfinder.fixtures.Fixtures;
+import test.com.ashwinchat.jobfinder.setup.TestCase;
 
-public class TestDatabase {
+public class TestDatabase extends TestCase {
     private Connection connection;
 
     @Before

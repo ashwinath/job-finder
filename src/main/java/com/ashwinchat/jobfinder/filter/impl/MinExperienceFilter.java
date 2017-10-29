@@ -24,7 +24,7 @@ public class MinExperienceFilter extends FilterTemplate {
             return x -> {
                 BigDecimal minExp = x.getExpMin();
                 if (Objects.nonNull(minExp)) {
-                    return minExp.compareTo(valueBd) >= 0;
+                    return minExp.compareTo(valueBd) <= 0;
                 }
                 // No filtering if not specified
                 return true;

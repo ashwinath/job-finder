@@ -20,11 +20,13 @@ import com.ashwinchat.jobfinder.filter.impl.CompanyNameFilter;
 import com.ashwinchat.jobfinder.filter.impl.JobDescriptionFilter;
 import com.ashwinchat.jobfinder.filter.impl.MaxExperienceFilter;
 import com.ashwinchat.jobfinder.filter.impl.MinExperienceFilter;
+import com.ashwinchat.jobfinder.filter.impl.NegativeJobDescriptionFilter;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
 
 import test.com.ashwinchat.jobfinder.fixtures.Fixtures;
+import test.com.ashwinchat.jobfinder.setup.TestCase;
 
-public class TestFilters {
+public class TestFilters extends TestCase {
 
     private Connection connection;
     private static final String INSERT_SYSTEM_CONFIG_STATEMENT = "insert into SystemConfig (sysCd, key, value) values (?, ?, ?)";
@@ -51,14 +53,21 @@ public class TestFilters {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_MIN_EXP);
-            statement.setString(3, "100");
+            statement.setString(3, "1");
             statement.execute();
         }
 
         try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_MAX_EXP);
-            statement.setString(3, "200");
+            statement.setString(3, "4");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_JOB_DESCR_NEGATIVE);
+            statement.setString(3, "SLAVE");
             statement.execute();
         }
     }
@@ -82,14 +91,14 @@ public class TestFilters {
         try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_MIN_EXP);
-            statement.setString(3, "100");
+            statement.setString(3, "1");
             statement.execute();
         }
 
         try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_MAX_EXP);
-            statement.setString(3, "200");
+            statement.setString(3, "4");
             statement.execute();
         }
 
@@ -104,6 +113,13 @@ public class TestFilters {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_MIN_EXP);
             statement.setString(3, "error config");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_JOB_DESCR_NEGATIVE);
+            statement.setString(3, "SLAVE");
             statement.execute();
         }
     }
@@ -140,8 +156,8 @@ public class TestFilters {
         info.setJobDescr("lalala");
         infos.add(info);
 
-        Filter companyFilter = new JobDescriptionFilter();
-        List<ScrapedInfo> filteredInfos = companyFilter.filter(infos);
+        Filter jdFilter = new JobDescriptionFilter();
+        List<ScrapedInfo> filteredInfos = jdFilter.filter(infos);
 
         Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
     }
@@ -152,8 +168,33 @@ public class TestFilters {
         ScrapedInfo info = Fixtures.createScrapedInfo();
         infos.add(info);
 
-        Filter companyFilter = new JobDescriptionFilter();
-        List<ScrapedInfo> filteredInfos = companyFilter.filter(infos);
+        Filter jdFilter = new JobDescriptionFilter();
+        List<ScrapedInfo> filteredInfos = jdFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+    }
+
+    @Test
+    public void testNegativeJdFilterBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setJobDescr("slave");
+        infos.add(info);
+
+        Filter jdFilter = new NegativeJobDescriptionFilter();
+        List<ScrapedInfo> filteredInfos = jdFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
+    }
+
+    @Test
+    public void testNegativeJdFilterNotBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        infos.add(info);
+
+        Filter jdFilter = new NegativeJobDescriptionFilter();
+        List<ScrapedInfo> filteredInfos = jdFilter.filter(infos);
 
         Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
     }
@@ -162,7 +203,7 @@ public class TestFilters {
     public void testExpMinFilterBlocking() throws Exception {
         List<ScrapedInfo> infos = new ArrayList<>();
         ScrapedInfo info = Fixtures.createScrapedInfo();
-        info.setExpMin(BigDecimal.ONE);
+        info.setExpMin(new BigDecimal("2"));
         infos.add(info);
 
         Filter minExpFilter = new MinExperienceFilter();

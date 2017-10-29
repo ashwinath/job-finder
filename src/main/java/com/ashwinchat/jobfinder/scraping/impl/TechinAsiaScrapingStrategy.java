@@ -34,8 +34,12 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
 
     @Override
     public List<ScrapedInfo> scrape() {
-        List<String> allLinks = this.findAllJobLinks();
-        return allLinks.stream().map(this::getJobInfoFromAPage).collect(Collectors.toList());
+        try {
+            List<String> allLinks = this.findAllJobLinks();
+            return allLinks.stream().map(this::getJobInfoFromAPage).collect(Collectors.toList());
+        } finally {
+            this.webDriver.close();
+        }
     }
 
     private List<String> findAllJobLinks() {
