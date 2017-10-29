@@ -30,8 +30,8 @@ public final class Fixtures {
         scrapedInfo.setAgency("test agency");
         scrapedInfo.setCompanyName(COMPANY_NAME);
         scrapedInfo.setCreOn(LocalDateTime.now());
-        scrapedInfo.setExpMax(BigDecimal.ONE);
-        scrapedInfo.setExpMin(BigDecimal.ONE);
+        scrapedInfo.setExpMax(new BigDecimal("200"));
+        scrapedInfo.setExpMin(new BigDecimal("100"));
         scrapedInfo.setJobDescr("Test job descr");
         scrapedInfo.setPayMax(BigDecimal.ONE);
         scrapedInfo.setPayMin(BigDecimal.ONE);

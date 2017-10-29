@@ -1,5 +1,6 @@
 package test.com.ashwinchat.jobfinder.filters;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -13,10 +14,12 @@ import org.junit.Test;
 
 import com.ashwinchat.jobfinder.config.SqLiteDatabaseConnection;
 import com.ashwinchat.jobfinder.constants.Constants;
+import com.ashwinchat.jobfinder.factory.FilterFactory;
 import com.ashwinchat.jobfinder.filter.Filter;
 import com.ashwinchat.jobfinder.filter.impl.CompanyNameFilter;
-import com.ashwinchat.jobfinder.filter.impl.CompositeFilter;
 import com.ashwinchat.jobfinder.filter.impl.JobDescriptionFilter;
+import com.ashwinchat.jobfinder.filter.impl.MaxExperienceFilter;
+import com.ashwinchat.jobfinder.filter.impl.MinExperienceFilter;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
 
 import test.com.ashwinchat.jobfinder.fixtures.Fixtures;
@@ -44,6 +47,20 @@ public class TestFilters {
             statement.setString(3, "test");
             statement.execute();
         }
+
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_EXP);
+            statement.setString(3, "100");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_EXP);
+            statement.setString(3, "200");
+            statement.execute();
+        }
     }
 
     @After
@@ -62,6 +79,33 @@ public class TestFilters {
             statement.execute();
         }
 
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_EXP);
+            statement.setString(3, "100");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_EXP);
+            statement.setString(3, "200");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_EXP);
+            statement.setString(3, "error config");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_EXP);
+            statement.setString(3, "error config");
+            statement.execute();
+        }
     }
 
     @Test
@@ -115,12 +159,109 @@ public class TestFilters {
     }
 
     @Test
+    public void testExpMinFilterBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setExpMin(BigDecimal.ONE);
+        infos.add(info);
+
+        Filter minExpFilter = new MinExperienceFilter();
+        List<ScrapedInfo> filteredInfos = minExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
+    }
+
+    @Test
+    public void testExpMaxFilterBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setExpMax(new BigDecimal("201"));
+        infos.add(info);
+
+        Filter maxExpFilter = new MaxExperienceFilter();
+        List<ScrapedInfo> filteredInfos = maxExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
+    }
+
+    @Test
+    public void testExpMaxFilterError() throws Exception {
+        this.cleanup();
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_EXP);
+            statement.setString(3, "error config");
+            statement.execute();
+        }
+
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        infos.add(info);
+
+        Filter maxExpFilter = new MaxExperienceFilter();
+        List<ScrapedInfo> filteredInfos = maxExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
+    public void testExpMinFilterError() throws Exception {
+        this.cleanup();
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_EXP);
+            statement.setString(3, "error config");
+            statement.execute();
+        }
+
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        infos.add(info);
+
+        Filter minExpFilter = new MinExperienceFilter();
+        List<ScrapedInfo> filteredInfos = minExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
+    public void testExpMinFilterNull() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setExpMin(null);
+        infos.add(info);
+
+        Filter minExpFilter = new MinExperienceFilter();
+        List<ScrapedInfo> filteredInfos = minExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
+    public void testExpMaxFilterNull() throws Exception {
+
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setExpMax(null);
+        infos.add(info);
+
+        Filter maxExpFilter = new MaxExperienceFilter();
+        List<ScrapedInfo> filteredInfos = maxExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
     public void testCompositeFilterBlocking() throws Exception {
         List<ScrapedInfo> infos = new ArrayList<>();
         ScrapedInfo info = Fixtures.createScrapedInfo();
         infos.add(info);
 
-        Filter compositeFilter = new CompositeFilter(new JobDescriptionFilter(), new CompanyNameFilter());
+        Filter compositeFilter = FilterFactory.getInstance().buildCompositeFilter();
         List<ScrapedInfo> filteredInfos = compositeFilter.filter(infos);
         Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
     }
@@ -132,7 +273,7 @@ public class TestFilters {
         info.setCompanyName("lalala");
         infos.add(info);
 
-        Filter compositeFilter = new CompositeFilter(new JobDescriptionFilter(), new CompanyNameFilter());
+        Filter compositeFilter = FilterFactory.getInstance().buildCompositeFilter();
         List<ScrapedInfo> filteredInfos = compositeFilter.filter(infos);
         Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
     }

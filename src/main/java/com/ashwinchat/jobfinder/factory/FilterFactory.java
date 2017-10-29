@@ -6,6 +6,8 @@ import com.ashwinchat.jobfinder.filter.Filter;
 import com.ashwinchat.jobfinder.filter.impl.CompanyNameFilter;
 import com.ashwinchat.jobfinder.filter.impl.CompositeFilter;
 import com.ashwinchat.jobfinder.filter.impl.JobDescriptionFilter;
+import com.ashwinchat.jobfinder.filter.impl.MaxExperienceFilter;
+import com.ashwinchat.jobfinder.filter.impl.MinExperienceFilter;
 
 public class FilterFactory {
     private static FilterFactory instance = null;
@@ -23,7 +25,13 @@ public class FilterFactory {
     public Filter buildCompositeFilter() {
         Filter jobDescrFilter = new JobDescriptionFilter();
         Filter companyNameFilter = new CompanyNameFilter();
-        return new CompositeFilter(jobDescrFilter, companyNameFilter);
+
+        // Experience Filters
+        Filter minExpFilter = new MinExperienceFilter();
+        Filter maxExpFilter = new MaxExperienceFilter();
+        Filter experienceFilter = new CompositeFilter(maxExpFilter, minExpFilter);
+
+        return new CompositeFilter(jobDescrFilter, companyNameFilter, experienceFilter);
     }
 
 }

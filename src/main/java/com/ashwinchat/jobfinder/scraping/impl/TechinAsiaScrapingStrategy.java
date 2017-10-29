@@ -16,15 +16,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.ashwinchat.jobfinder.constants.Constants;
+import com.ashwinchat.jobfinder.factory.SeleniumDriverFactory;
 import com.ashwinchat.jobfinder.scraping.ScrapingStrategy;
-import com.ashwinchat.jobfinder.selenium.SeleniumDriver;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
 
 public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
 
     private static final String BASE_URL_FORMAT = "https://www.techinasia.com/jobs?job_category_name%5B%5D=Web%20Development&job_category_name%5B%5D=Enterprise%20Software%20%26%20Systems&job_type_name%5B%5D=Full-time&location_name%5B%5D=Singapore&page=";
     private static final String AGENCY_NAME = Constants.TECH_IN_ASIA_NAME;
-    private WebDriver webDriver = SeleniumDriver.getInstance().getDriver();
+    private WebDriver webDriver = SeleniumDriverFactory.getInstance().createChromeWebDriver();
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     private static final int NORMAL_SCENARIO = 0;
