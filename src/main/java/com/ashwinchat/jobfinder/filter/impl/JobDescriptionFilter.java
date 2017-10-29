@@ -18,8 +18,8 @@ public class JobDescriptionFilter extends FilterTemplate {
     protected Predicate<ScrapedInfo> filterCriteria(List<String> valuesToFilter) {
         return x -> {
             String jobDescr = StringUtils.upperCase(x.getJobDescr());
-            return valuesToFilter.stream().filter(filterValue -> StringUtils.contains(jobDescr, filterValue))
-                    .findFirst().map(value -> true).orElse(false);
+            return valuesToFilter.stream().filter(filterValue -> StringUtils.contains(StringUtils.upperCase(jobDescr),
+                    StringUtils.upperCase(filterValue))).findFirst().map(value -> true).orElse(false);
         };
     }
 

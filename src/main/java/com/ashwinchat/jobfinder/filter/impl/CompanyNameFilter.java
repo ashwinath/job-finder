@@ -18,9 +18,9 @@ public class CompanyNameFilter extends FilterTemplate {
     protected Predicate<ScrapedInfo> filterCriteria(List<String> valuesToFilter) {
         return x -> {
             String companyName = StringUtils.upperCase(x.getCompanyName());
-            boolean foundSimilar = valuesToFilter.stream()
-                    .filter(filterValue -> StringUtils.equals(companyName, filterValue)).findFirst().map(value -> true)
-                    .orElse(false);
+            boolean foundSimilar = valuesToFilter.stream().filter(filterValue -> StringUtils
+                    .equals(StringUtils.upperCase(companyName), StringUtils.upperCase(filterValue))).findFirst()
+                    .map(value -> true).orElse(false);
 
             return !foundSimilar;
         };
