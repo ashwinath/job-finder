@@ -19,7 +19,9 @@ import com.ashwinchat.jobfinder.filter.Filter;
 import com.ashwinchat.jobfinder.filter.impl.CompanyNameFilter;
 import com.ashwinchat.jobfinder.filter.impl.JobDescriptionFilter;
 import com.ashwinchat.jobfinder.filter.impl.MaxExperienceFilter;
+import com.ashwinchat.jobfinder.filter.impl.MaxSalaryFilter;
 import com.ashwinchat.jobfinder.filter.impl.MinExperienceFilter;
+import com.ashwinchat.jobfinder.filter.impl.MinSalaryFilter;
 import com.ashwinchat.jobfinder.filter.impl.NegativeJobDescriptionFilter;
 import com.ashwinchat.jobfinder.view.ScrapedInfo;
 
@@ -68,6 +70,20 @@ public class TestFilters extends TestCase {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_JOB_DESCR_NEGATIVE);
             statement.setString(3, "SLAVE");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_PAY);
+            statement.setString(3, "9000");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_PAY);
+            statement.setString(3, "8000");
             statement.execute();
         }
     }
@@ -120,6 +136,20 @@ public class TestFilters extends TestCase {
             statement.setString(1, Constants.SYS_CD_FILTER);
             statement.setString(2, Constants.KEY_JOB_DESCR_NEGATIVE);
             statement.setString(3, "SLAVE");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MAX_PAY);
+            statement.setString(3, "9000");
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_SYSTEM_CONFIG_STATEMENT)) {
+            statement.setString(1, Constants.SYS_CD_FILTER);
+            statement.setString(2, Constants.KEY_MIN_PAY);
+            statement.setString(3, "8000");
             statement.execute();
         }
     }
@@ -294,6 +324,61 @@ public class TestFilters extends TestCase {
 
         Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
 
+    }
+
+    @Test
+    public void testPayMinFilterNull() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setPayMin(null);
+        infos.add(info);
+
+        Filter minExpFilter = new MinSalaryFilter();
+        List<ScrapedInfo> filteredInfos = minExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
+    public void testPayMaxFilterNull() throws Exception {
+
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setPayMax(null);
+        infos.add(info);
+
+        Filter maxExpFilter = new MaxSalaryFilter();
+        List<ScrapedInfo> filteredInfos = maxExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(filteredInfos));
+
+    }
+
+    @Test
+    public void testPayMinFilterBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setPayMin(new BigDecimal("2"));
+        infos.add(info);
+
+        Filter minExpFilter = new MinSalaryFilter();
+        List<ScrapedInfo> filteredInfos = minExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
+    }
+
+    @Test
+    public void testPayMaxFilterBlocking() throws Exception {
+        List<ScrapedInfo> infos = new ArrayList<>();
+        ScrapedInfo info = Fixtures.createScrapedInfo();
+        info.setPayMax(new BigDecimal("8000"));
+        infos.add(info);
+
+        Filter maxExpFilter = new MaxSalaryFilter();
+        List<ScrapedInfo> filteredInfos = maxExpFilter.filter(infos);
+
+        Assert.assertTrue(CollectionUtils.isEmpty(filteredInfos));
     }
 
     @Test

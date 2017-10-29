@@ -33,11 +33,10 @@ public abstract class FilterTemplate implements Filter {
 
             return scrapedInfos.stream().filter(this.filterCriteria(valuesToFilter)).collect(Collectors.toList());
         } catch (Exception e) {
-            logger.warning(String.format(Constants.CONFIG_NOT_FOUND, Constants.SYS_CD_FILTER, Constants.KEY_COMPANY,
-                    ExceptionUtils.getStackTrace(e)));
+            logger.severe(ExceptionUtils.getStackTrace(e));
         }
 
-        // Do not filter if there's an error
+        // Don't filter
         return scrapedInfos;
     }
 

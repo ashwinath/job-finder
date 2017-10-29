@@ -33,8 +33,8 @@ public final class Fixtures {
         scrapedInfo.setExpMax(new BigDecimal("4"));
         scrapedInfo.setExpMin(new BigDecimal("0"));
         scrapedInfo.setJobDescr("Test job descr");
-        scrapedInfo.setPayMax(BigDecimal.ONE);
-        scrapedInfo.setPayMin(BigDecimal.ONE);
+        scrapedInfo.setPayMax(new BigDecimal("9000"));
+        scrapedInfo.setPayMin(new BigDecimal("8000"));
         scrapedInfo.setTitle("test title");
         scrapedInfo.setUrl("testurl.com");
         return scrapedInfo;
