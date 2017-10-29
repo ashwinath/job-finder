@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -12,8 +13,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
 import com.ashwinchat.jobfinder.constants.Constants;
 import com.ashwinchat.jobfinder.factory.SeleniumDriverFactory;
@@ -71,7 +75,12 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
 
             this.webDriver.get(url);
 
-            String title = this.webDriver.findElement(By.className("entity__name")).getText();
+            // Sometimes there's an error loading the page, we wait for the site to reload
+            // (30s auto refresh).
+            Wait<WebDriver> waitingDriver = new FluentWait<>(this.webDriver).withTimeout(30, TimeUnit.SECONDS)
+                    .pollingEvery(200, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
+            String title = waitingDriver.until(driver -> driver.findElement(By.className("entity__name")).getText());
+
             scrapedInfo.setTitle(title);
 
             String companyName = this.webDriver.findElement(By.cssSelector(".entity__type a")).getText();
