@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,7 +21,11 @@ public class SeleniumDriverFactory {
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     private SeleniumDriverFactory() {
-        System.setProperty("webdriver.chrome.driver", "/chromedriver.exe");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            System.setProperty("webdriver.chrome.driver", "./chromedriver.exe");
+        } else if (SystemUtils.IS_OS_MAC) {
+            System.setProperty("webdriver.chrome.driver", "./chromedriver");
+        }
     }
 
     public static SeleniumDriverFactory getInstance() {
