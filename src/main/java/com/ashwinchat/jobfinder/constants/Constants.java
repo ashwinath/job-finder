@@ -14,5 +14,10 @@ public final class Constants {
     public static final String KEY_MAX_EXP = "MAX_EXP";
     public static final String KEY_MIN_PAY = "MIN_PAY";
     public static final String KEY_MAX_PAY = "MAX_PAY";
+
     public static final String DATABASE_LOCATION_PROPERTY = "SQLITE_DB_LOCATION";
+
+    public static final String SYS_CD_SELENIUM = "SELENIUM";
+    public static final String KEY_HEADLESS = "HEADLESS";
+    public static final String VALUE_TRUE = "TRUE";
 }

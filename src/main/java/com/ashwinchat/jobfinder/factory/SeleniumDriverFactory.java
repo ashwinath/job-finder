@@ -1,13 +1,23 @@
 package com.ashwinchat.jobfinder.factory;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import com.ashwinchat.jobfinder.constants.Constants;
+import com.ashwinchat.jobfinder.database.DatabaseUtil;
+import com.ashwinchat.jobfinder.view.SystemConfig;
+
 public class SeleniumDriverFactory {
     private static SeleniumDriverFactory instance = null;
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     private SeleniumDriverFactory() {
         System.setProperty("webdriver.chrome.driver", "/chromedriver.exe");
@@ -22,9 +32,29 @@ public class SeleniumDriverFactory {
     }
 
     public WebDriver createChromeWebDriver() {
+        return new ChromeDriver(this.checkHeadlessCondition());
+    }
+
+    private ChromeOptions checkHeadlessCondition() {
         final ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        return new ChromeDriver(chromeOptions);
+        try {
+            List<SystemConfig> config = DatabaseUtil.getSystemConfigValue(Constants.SYS_CD_SELENIUM,
+                    Constants.KEY_HEADLESS);
+            if (CollectionUtils.isNotEmpty(config)) {
+                String headlessInd = config.get(0).getValue();
+                if (StringUtils.equals(StringUtils.upperCase(headlessInd), Constants.VALUE_TRUE)) {
+                    chromeOptions.addArguments("--headless");
+                }
+            }
+        } catch (Exception e) {
+            logger.severe(ExceptionUtils.getRootCauseMessage(e));
+            logger.severe("Unable to connect to database, please check if there is a database. It should be at "
+                    + System.getProperty(Constants.DATABASE_LOCATION_PROPERTY));
+            // No Database connection, no point continuing
+            System.exit(-1);
+        }
+
+        return chromeOptions;
     }
 
 }
