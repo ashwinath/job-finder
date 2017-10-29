@@ -152,7 +152,7 @@ public class TechinAsiaScrapingStrategy implements ScrapingStrategy {
         if (StringUtils.contains(salary, "Up to SGD")) {
             scrapedInfo.setPayMin(BigDecimal.ZERO);
             scrapedInfo.setPayMax(new BigDecimal(stringSplit[0]));
-        } else if (StringUtils.contains(salary, "SGD")) {
+        } else if (stringSplit.length == 1) {
             // This is short circuited
             // Could be in the form of just SGD ... (single value)
             scrapedInfo.setPayMin(new BigDecimal(stringSplit[0]));
